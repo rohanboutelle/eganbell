@@ -1,0 +1,1517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#101728">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" media="print" onload="this.media='all'" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;800&family=Martian+Mono:wght@300;500;700&display=swap">
+<style>
+  /* ---------- themes ----------
+     Every colour in the app comes from these. --bell is the primary
+     accent, --mint the secondary, --glow the top-of-page wash. */
+  :root, [data-theme="dark"]{
+    --ink:#101728;  --glow:#1B2740;  --slate:#19233A;
+    --edge:#25314F;  --edge2:#3A4A70;  --rail:#33436B;
+    --chalk:#E9EEF7; --dim:#7788A8;
+    --bell:#FFB627;  --bell-bg:#221B0E; --bell-edge:#4A3A1A;
+    --mint:#57D5A4;  --mint-bg:#0F2620; --mint-edge:#1D4438;
+  }
+  [data-theme="light"]{
+    --ink:#F6F8FB;  --glow:#FFFFFF;  --slate:#FFFFFF;
+    --edge:#DFE4EC;  --edge2:#B4C0D2;  --rail:#C3CEDE;
+    --chalk:#121A2B; --dim:#5C6A83;
+    --bell:#A85F00;  --bell-bg:#FFF4E0; --bell-edge:#EFD6A8;
+    --mint:#0D7350;  --mint-bg:#E3F6EE; --mint-edge:#B2E2CE;
+  }
+  [data-theme="fall"]{
+    --ink:#FDF3E7;  --glow:#FFFBF4;  --slate:#FFFFFF;
+    --edge:#EFDBC3;  --edge2:#DABE9A;  --rail:#E0C29E;
+    --chalk:#3C2412; --dim:#8A6A4B;
+    --bell:#BC4C15;  --bell-bg:#FBE4D2; --bell-edge:#EFC1A0;
+    --mint:#7A6118;  --mint-bg:#F5EACB; --mint-edge:#DFCB95;
+  }
+  [data-theme="space"]{
+    --ink:#060A1A;  --glow:#111C42;  --slate:#0F1634;
+    --edge:#1E2A55;  --edge2:#34457E;  --rail:#2A3868;
+    --chalk:#F3F6FF; --dim:#7A87B6;
+    --bell:#FFFFFF;  --bell-bg:#161E45; --bell-edge:#303F76;
+    --mint:#8FB3FF;  --mint-bg:#111A3C; --mint-edge:#26376F;
+  }
+  [data-theme="coffee"]{
+    --ink:#231A13;  --glow:#372718;  --slate:#2E2218;
+    --edge:#443327;  --edge2:#5F4835;  --rail:#5A4433;
+    --chalk:#F1E5D5; --dim:#A78F79;
+    --bell:#DBA268;  --bell-bg:#332517; --bell-edge:#5B4029;
+    --mint:#B6C89B;  --mint-bg:#232B1D; --mint-edge:#3D4B32;
+  }
+  [data-theme="arctic"]{
+    --ink:#EFF6FB;  --glow:#FFFFFF;  --slate:#FFFFFF;
+    --edge:#D2E3ED;  --edge2:#A6C7DB;  --rail:#B4D2E3;
+    --chalk:#0E2937; --dim:#4D7186;
+    --bell:#0A7398;  --bell-bg:#DEF1F9; --bell-edge:#ADDAEB;
+    --mint:#2A7B72;  --mint-bg:#DFF3F0; --mint-edge:#AEDDD6;
+  }
+  [data-theme="forest"]{
+    --ink:#0D1915;  --glow:#16291F;  --slate:#14231F;
+    --edge:#22372F;  --edge2:#375449;  --rail:#2C4A3E;
+    --chalk:#E5F0E9; --dim:#7B9A8B;
+    --bell:#C99B5D;  --bell-bg:#2A2015; --bell-edge:#4B3823;
+    --mint:#4FC1A0;  --mint-bg:#0F2A24; --mint-edge:#1E4739;
+  }
+  [data-theme="blue"]{
+    --ink:#EDF4FD;  --glow:#FFFFFF;  --slate:#FFFFFF;
+    --edge:#D5E3F5;  --edge2:#A6C4E7;  --rail:#B6D0EE;
+    --chalk:#112340; --dim:#4B6A8D;
+    --bell:#2666BC;  --bell-bg:#E0ECFB; --bell-edge:#B3D0F2;
+    --mint:#2A6C8A;  --mint-bg:#E1EFF6; --mint-edge:#B2D8E6;
+  }
+
+  :root{
+    --rail-w:6px;
+    --pad:clamp(16px,4vw,28px);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--ink);color:var(--chalk)}
+  body{
+    font-family:'Archivo',system-ui,-apple-system,'Segoe UI',sans-serif;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;padding:var(--pad);
+    display:flex;justify-content:center;
+    background-image:radial-gradient(120% 60% at 50% -10%, var(--glow) 0%, var(--ink) 60%);
+  }
+  .wrap{width:100%;max-width:560px}
+
+  /* ---------- header: wordmark + live SF clock ---------- */
+  header{
+    display:flex;align-items:center;justify-content:flex-end;
+    gap:12px;padding-bottom:16px;border-bottom:1px solid var(--edge);
+  }
+  .nowclock{display:flex;align-items:center;gap:8px}
+  .dot{width:6px;height:6px;border-radius:50%;background:var(--mint);flex:none;animation:pulse 2.4s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+  .nowtime{
+    font-family:'Martian Mono',ui-monospace,monospace;
+    font-size:14px;font-weight:500;letter-spacing:-.05em;font-variant-numeric:tabular-nums;
+  }
+  .nowdate{font-size:11px;color:var(--dim);text-align:right;margin-top:6px;letter-spacing:.04em}
+
+  /* ---------- hero ---------- */
+  .hero{padding:28px 0 26px}
+  .eyebrow{font-size:10px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--bell);margin-bottom:12px}
+  .eyebrow.rest{color:var(--mint)}
+  .eyebrow.off{color:var(--dim)}
+  h1{font-size:clamp(38px,11vw,60px);line-height:.92;font-weight:800;letter-spacing:-.045em;margin-bottom:10px}
+  .sub{font-size:15px;color:var(--dim);font-weight:500}
+  .countdown{display:flex;align-items:flex-end;gap:11px;margin-top:22px;padding-top:18px;border-top:1px solid var(--edge)}
+  .clock{
+    font-family:'Martian Mono',ui-monospace,monospace;
+    font-size:clamp(32px,10vw,50px);font-weight:500;letter-spacing:-.06em;
+    font-variant-numeric:tabular-nums;line-height:1;color:var(--bell);
+  }
+  .clock.rest{color:var(--mint)}
+  .clock.off{color:var(--dim)}
+  .clock-label{font-size:12px;color:var(--dim);padding-bottom:5px;font-weight:500}
+  .upnext{margin-top:14px;font-size:14px;color:var(--dim)}
+  .upnext b{color:var(--chalk);font-weight:600}
+
+  /* ---------- schedule selector ---------- */
+  .sel-head{
+    font-size:10px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--dim);margin-bottom:10px;
+  }
+  .picker{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:26px}
+  .picker button{
+    font-family:inherit;font-size:13px;font-weight:600;letter-spacing:-.01em;text-align:left;
+    color:var(--dim);background:var(--slate);border:1px solid var(--edge);
+    border-radius:9px;padding:11px 13px;cursor:pointer;
+    display:flex;align-items:center;justify-content:space-between;gap:8px;
+    transition:color .15s,border-color .15s,background .15s;
+  }
+  .picker button:hover{color:var(--chalk);border-color:var(--edge2)}
+  .picker button > span:first-child{min-width:0;line-height:1.25}
+  .picker button:focus-visible{outline:2px solid var(--bell);outline-offset:2px}
+  .picker button[aria-pressed="true"]{color:var(--ink);background:var(--chalk);border-color:var(--chalk)}
+  .picker button .flag{
+    font-family:'Martian Mono',ui-monospace,monospace;font-size:8.5px;letter-spacing:0;
+    color:var(--bell);border:1px solid var(--bell-edge);background:var(--bell-bg);
+    padding:2px 5px;border-radius:3px;flex:none;
+  }
+  .picker button[aria-pressed="true"] .flag{color:var(--ink);background:var(--bell);border-color:var(--bell)}
+  .picker button.wide{grid-column:span 2}
+
+  /* ---------- schedule head ---------- */
+  .shead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
+  .sname{font-size:13px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
+  .tag{
+    font-family:'Martian Mono',ui-monospace,monospace;font-size:9.5px;letter-spacing:-.02em;
+    padding:4px 8px;border-radius:4px;background:var(--slate);color:var(--dim);
+    border:1px solid var(--edge);white-space:nowrap;
+  }
+  .tag.odd{color:var(--bell);border-color:var(--bell-edge);background:var(--bell-bg)}
+  .tag.even{color:var(--mint);border-color:var(--mint-edge);background:var(--mint-bg)}
+
+  /* ---------- the tape ---------- */
+  .tape{position:relative;padding-bottom:8px}
+  .row{display:flex;align-items:stretch;gap:14px;position:relative}
+  .seg{width:var(--rail-w);flex:none;border-radius:3px;background:var(--edge)}
+  .row.period .seg{background:var(--rail)}
+  .row.now .seg{background:var(--bell)}
+  .row.now.rest .seg{background:var(--mint)}
+  .row.gap .seg{background:transparent;border-left:var(--rail-w) dotted var(--edge);border-radius:0;width:0}
+  .row.done .seg{opacity:.35}
+  .row.free .seg{background:linear-gradient(180deg,var(--mint),var(--mint-edge))}
+  .cell{flex:1;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:2px 0;min-width:0}
+  .lbl{font-size:14.5px;font-weight:600;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .row.gap .lbl{font-size:11px;font-weight:500;color:var(--dim);letter-spacing:.04em}
+  .row.done .lbl{color:var(--dim);font-weight:500}
+  .row.now .lbl{color:var(--bell)}
+  .row.now.rest .lbl{color:var(--mint)}
+  .row.free .lbl{color:var(--mint);font-size:20px;font-weight:800}
+  .meta{
+    font-family:'Martian Mono',ui-monospace,monospace;font-size:10.5px;letter-spacing:-.04em;
+    color:var(--dim);font-variant-numeric:tabular-nums;white-space:nowrap;flex:none;
+  }
+  .row.gap .meta{font-size:9.5px;opacity:.7}
+  .row.now .meta{color:var(--chalk)}
+
+  .nowline{
+    position:absolute;left:0;right:0;height:0;border-top:1.5px solid var(--bell);
+    pointer-events:none;z-index:2;transition:top .6s cubic-bezier(.4,0,.2,1);
+  }
+  .nowline::after{
+    content:"";position:absolute;left:-3px;top:-4.5px;width:9px;height:9px;
+    border-radius:50%;background:var(--bell);box-shadow:0 0 0 4px var(--ink);
+  }
+  .nowline.rest{border-top-color:var(--mint)}
+  .nowline.rest::after{background:var(--mint)}
+  .nowline.hidden{display:none}
+
+  /* ---------- day progress + meal countdowns ---------- */
+  .dayprog{margin-bottom:24px}
+  .prog-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:9px}
+  .prog-label{font-size:10px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--dim)}
+  .prog-pct{
+    font-family:'Martian Mono',ui-monospace,monospace;font-size:13px;font-weight:500;
+    letter-spacing:-.05em;color:var(--bell);font-variant-numeric:tabular-nums;
+  }
+  .progbar{height:5px;border-radius:3px;background:var(--edge);overflow:hidden}
+  .progbar > div{height:100%;background:var(--bell);border-radius:3px;transition:width .8s linear}
+  .mealrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));gap:7px;margin-top:13px}
+  .mealrow:empty{display:none}
+  .meal{background:var(--slate);border:1px solid var(--edge);border-radius:9px;padding:10px 12px 11px}
+  .meal-label{
+    font-size:8.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--dim);margin-bottom:7px;
+  }
+  .meal-time{
+    font-family:'Martian Mono',ui-monospace,monospace;
+    font-size:clamp(15px,4.6vw,20px);font-weight:500;letter-spacing:-.06em;line-height:1;
+    color:var(--mint);font-variant-numeric:tabular-nums;
+  }
+  .meal-at{
+    font-family:'Martian Mono',ui-monospace,monospace;font-size:9px;letter-spacing:-.03em;
+    color:var(--dim);opacity:.75;margin-top:7px;
+  }
+
+  /* ---------- countdowns ---------- */
+  .counts{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+  .count{
+    background:var(--slate);border:1px solid var(--edge);border-radius:10px;
+    padding:12px 11px 11px;min-width:0;
+  }
+  .count-label{
+    font-size:8.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--dim);margin-bottom:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .count-num{
+    font-family:'Martian Mono',ui-monospace,monospace;
+    font-size:clamp(19px,5.6vw,27px);font-weight:500;letter-spacing:-.07em;
+    line-height:1;color:var(--bell);font-variant-numeric:tabular-nums;
+  }
+  .count-num.soft{color:var(--mint);font-size:clamp(14px,4vw,18px)}
+  .count-unit{font-size:10px;color:var(--dim);margin-top:5px;line-height:1.3}
+  .count-date{
+    font-family:'Martian Mono',ui-monospace,monospace;font-size:9px;letter-spacing:-.03em;
+    color:var(--dim);opacity:.75;margin-top:8px;white-space:nowrap;
+  }
+
+  /* ---------- events ---------- */
+  .eventbar{
+    border:1px solid var(--bell-edge);background:var(--bell-bg);border-radius:10px;
+    padding:13px 15px;margin-bottom:22px;
+  }
+  .eventbar + .eventbar{margin-top:-12px}
+  .ev-name{font-size:15px;font-weight:700;letter-spacing:-.015em;color:var(--bell)}
+  .ev-time{
+    font-family:'Martian Mono',ui-monospace,monospace;font-size:10.5px;
+    letter-spacing:-.03em;color:var(--bell);opacity:.85;margin-top:5px;
+  }
+  .ev-note{font-size:12.5px;color:var(--dim);margin-top:5px;line-height:1.45}
+
+  .up-row{
+    display:flex;align-items:baseline;justify-content:space-between;gap:12px;
+    padding:9px 0;border-bottom:1px solid var(--edge);
+  }
+  .up-row:last-child{border-bottom:0}
+  .up-name{font-size:13.5px;font-weight:600;min-width:0}
+  .up-note{font-size:11px;color:var(--dim);font-weight:400;margin-top:2px}
+  .up-date{
+    font-family:'Martian Mono',ui-monospace,monospace;font-size:10.5px;
+    letter-spacing:-.04em;color:var(--dim);white-space:nowrap;flex:none;
+  }
+  .chip{
+    font-family:'Martian Mono',ui-monospace,monospace;font-size:8.5px;
+    letter-spacing:0;color:var(--bell);border:1px solid var(--bell-edge);background:var(--bell-bg);
+    padding:2px 5px;border-radius:3px;margin-left:8px;white-space:nowrap;
+  }
+
+  .yearprog{margin-top:16px}
+  .year-line{font-size:13px;color:var(--dim);margin-top:10px;line-height:1.5}
+  .year-line b{color:var(--chalk);font-weight:700}
+  .year-sub{
+    font-family:'Martian Mono',ui-monospace,monospace;font-size:9.5px;
+    letter-spacing:-.03em;color:var(--dim);opacity:.75;margin-top:5px;
+  }
+
+  /* ---------- alarm ---------- */
+  .alarm-row{display:flex;align-items:center;flex-wrap:wrap;gap:8px;font-size:13px;color:var(--dim)}
+  .alarm-row + .alarm-row{margin-top:10px}
+  .alarm input[type="number"]{
+    font-family:'Martian Mono',ui-monospace,monospace;font-size:14px;font-weight:500;
+    width:62px;padding:7px 9px;text-align:center;
+    color:var(--chalk);background:var(--slate);border:1px solid var(--edge);border-radius:8px;
+    font-variant-numeric:tabular-nums;-moz-appearance:textfield;
+  }
+  .alarm input[type="number"]::-webkit-outer-spin-button,
+  .alarm input[type="number"]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+  .alarm select{
+    font-family:inherit;font-size:13px;font-weight:600;flex:1;min-width:0;
+    color:var(--chalk);background:var(--slate);border:1px solid var(--edge);
+    border-radius:8px;padding:8px 10px;cursor:pointer;
+  }
+  .alarm button{
+    font-family:inherit;font-size:12px;font-weight:700;letter-spacing:.04em;
+    color:var(--ink);background:var(--bell);border:1px solid var(--bell);
+    border-radius:8px;padding:8px 16px;cursor:pointer;flex:none;
+  }
+  .alarm button:active{opacity:.75}
+  .alarm input:focus-visible,.alarm select:focus-visible,.alarm button:focus-visible{
+    outline:2px solid var(--bell);outline-offset:2px;
+  }
+  .alarm-note{font-size:11px;color:var(--dim);line-height:1.55;margin-top:11px;opacity:.85}
+
+  /* ---------- theme picker ---------- */
+  .themes{display:flex;flex-wrap:wrap;gap:6px}
+  .themes button{
+    font-family:inherit;font-size:12px;font-weight:600;letter-spacing:-.01em;
+    color:var(--dim);background:var(--slate);border:1px solid var(--edge);
+    border-radius:999px;padding:7px 12px 7px 8px;cursor:pointer;
+    display:flex;align-items:center;gap:7px;
+    transition:color .15s,border-color .15s;
+  }
+  .themes button:hover{color:var(--chalk);border-color:var(--edge2)}
+  .themes button:focus-visible{outline:2px solid var(--bell);outline-offset:2px}
+  .themes button[aria-pressed="true"]{color:var(--chalk);border-color:var(--edge2)}
+  .swatch{width:13px;height:13px;border-radius:50%;flex:none;border:1px solid rgba(128,128,128,.35)}
+  .themes button[aria-pressed="true"] .swatch{box-shadow:0 0 0 2px var(--slate),0 0 0 3.5px var(--bell)}
+  .seasonal{font-size:9px;color:var(--dim);opacity:.8;margin-left:2px}
+  .theme-note{font-size:11px;color:var(--dim);line-height:1.55;margin-top:11px;opacity:.85}
+
+  footer{margin-top:26px;padding-top:16px;border-top:1px solid var(--edge);font-size:11px;color:var(--dim);line-height:1.6}
+  @media (max-width:380px){ .picker{grid-template-columns:1fr} .picker button.wide{grid-column:span 1} }  @media (prefers-reduced-motion:reduce){ *{animation:none!important;transition:none!important} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div>
+      <div class="nowclock"><span class="dot"></span><span class="nowtime" id="nowtime">--:--:--</span></div>
+      <div class="nowdate" id="nowdate">—</div>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="eyebrow" id="eyebrow">Right now</div>
+    <h1 id="title">Loading</h1>
+    <div class="sub" id="subtitle">Reading San Francisco time</div>
+    <div class="countdown">
+      <div class="clock" id="clock">--:--</div>
+      <div class="clock-label" id="clockLabel">remaining</div>
+    </div>
+    <div class="upnext" id="upnext"></div>
+  </section>
+
+  <section class="dayprog" id="dayprog" hidden>
+    <div class="prog-head">
+      <span class="prog-label">Through the day</span>
+      <span class="prog-pct" id="progPct">0%</span>
+    </div>
+    <div class="progbar"><div id="progFill" style="width:0%"></div></div>
+    <div class="mealrow" id="meals"></div>
+  </section>
+
+  <div id="eventbar"></div>
+
+  <div class="sel-head">Schedule</div>
+  <nav class="picker" id="picker" aria-label="Choose a bell schedule"></nav>
+
+  <div class="shead">
+    <div class="sname" id="sname">—</div>
+    <div class="tag" id="tag">—</div>
+  </div>
+
+  <div class="tape" id="tape"><div class="nowline hidden" id="nowline"></div></div>
+
+  <section id="countsWrap">
+    <div class="sel-head" style="margin-top:26px">Counting down</div>
+    <div class="counts" id="counts"></div>
+    <div class="yearprog" id="yearprog">
+      <div class="progbar"><div id="yearFill" style="width:0%"></div></div>
+      <div class="year-line" id="yearLine"></div>
+    </div>
+  </section>
+
+  <section id="upcomingWrap" hidden>
+    <div class="sel-head" style="margin-top:26px">Coming up</div>
+    <div id="upcoming"></div>
+  </section>
+
+  <div class="sel-head" style="margin-top:26px">Bell alert</div>
+  <div class="alarm">
+    <div class="alarm-row">
+      <span>Ring</span>
+      <input id="alarmMins" type="number" min="0" max="60" step="1" inputmode="numeric" placeholder="0">
+      <span>min before class ends</span>
+    </div>
+    <div class="alarm-row">
+      <select id="alarmRing" aria-label="Alarm sound"></select>
+      <button id="alarmTest" type="button">Test</button>
+    </div>
+    <div class="alarm-note" id="alarmNote"></div>
+  </div>
+
+  <div class="sel-head" style="margin-top:26px">Theme</div>
+  <nav class="themes" id="themes" aria-label="Choose a theme"></nav>
+  <div class="theme-note">Goes Dark after 7 PM so a light theme doesn't blind you at night. Pick any theme to override — your daytime choice comes back tomorrow.</div>
+
+  <footer>
+    Locked to San Francisco time — reads Pacific no matter what timezone the device is set to.
+    Today's schedule is picked on open; tap any other one to switch.
+  </footer>
+
+</div>
+
+<script>
+/* ---------- helpers ---------- */
+const T = (h, m) => h * 60 + m;
+const el = id => document.getElementById(id);
+
+/* ---------- the seven schedules ---------- */
+const SCHEDULES = {
+  mon: {
+    label:"Monday", name:"Monday", tag:"all periods", tagClass:"", warn:T(8,25),
+    blocks:[
+      ["Period 1","period",T(8,30),T(9,16)],
+      ["Period 2","period",T(9,19),T(10,5)],
+      ["Period 3 + Announcements","period",T(10,8),T(10,57)],
+      ["Brunch","rest",T(10,57),T(11,11)],
+      ["Period 4","period",T(11,14),T(12,0)],
+      ["Period 5","period",T(12,3),T(12,49)],
+      ["Lunch","rest",T(12,49),T(13,25)],
+      ["Period 6","period",T(13,28),T(14,14)],
+      ["Period 7","period",T(14,17),T(15,3)]
+    ]
+  },
+  tue: {
+    label:"Tuesday", sublabel:"Tutorial", name:"Tuesday · Tutorial", tag:"all periods", tagClass:"", warn:T(8,25),
+    blocks:[
+      ["Period 1","period",T(8,30),T(9,12)],
+      ["Period 2","period",T(9,15),T(9,57)],
+      ["Period 3 + Announcements","period",T(10,0),T(10,42)],
+      ["Brunch","rest",T(10,42),T(10,56)],
+      ["Tutorial","rest",T(10,59),T(11,27)],
+      ["Period 4","period",T(11,30),T(12,12)],
+      ["Period 5","period",T(12,15),T(12,57)],
+      ["Lunch","rest",T(12,57),T(13,33)],
+      ["Period 6","period",T(13,36),T(14,18)],
+      ["Period 7","period",T(14,21),T(15,3)]
+    ]
+  },
+  wed: {
+    label:"Wednesday Block", name:"Wednesday Block", tag:"even periods · late start", tagClass:"even", warn:T(9,12),
+    blocks:[
+      ["Period 2","period",T(9,17),T(10,39)],
+      ["Brunch","rest",T(10,39),T(10,53)],
+      ["Period 4","period",T(10,56),T(12,18)],
+      ["Lunch","rest",T(12,18),T(12,54)],
+      ["Period 6","period",T(12,57),T(14,19)],
+      ["Tutorial","rest",T(14,22),T(15,3)]
+    ]
+  },
+  wednb: {
+    label:"Wednesday Non-Block", name:"Wednesday Non-Block", tag:"all periods · late start", tagClass:"", warn:T(9,12),
+    blocks:[
+      ["Period 1","period",T(9,17),T(9,56)],
+      ["Period 2","period",T(9,59),T(10,37)],
+      ["Period 3","period",T(10,40),T(11,28)],
+      ["Brunch","rest",T(11,28),T(11,42)],
+      ["Period 4","period",T(11,45),T(12,23)],
+      ["Period 5","period",T(12,26),T(13,4)],
+      ["Lunch","rest",T(13,4),T(13,41)],
+      ["Period 6","period",T(13,44),T(14,22)],
+      ["Period 7","period",T(14,25),T(15,3)]
+    ]
+  },
+  assembly: {
+    label:"Assembly", name:"Assembly Schedule", tag:"blocks A–H", tagClass:"", warn:T(8,25),
+    blocks:[
+      ["A","period",T(8,30),T(9,10)],
+      ["B","period",T(9,13),T(9,53)],
+      ["C","period",T(9,56),T(10,37)],
+      ["Brunch","rest",T(10,37),T(10,51)],
+      ["D","period",T(10,54),T(11,34)],
+      ["E","period",T(11,37),T(12,17)],
+      ["Lunch","rest",T(12,17),T(12,54)],
+      ["F","period",T(12,57),T(13,37)],
+      ["G","period",T(13,40),T(14,20)],
+      ["H","period",T(14,23),T(15,3)]
+    ]
+  },
+  thu: {
+    label:"Thursday Block", name:"Thursday Block", tag:"odd periods", tagClass:"odd", warn:T(8,25),
+    blocks:[
+      ["Period 1","period",T(8,30),T(9,52)],
+      ["Break","rest",T(9,52),T(9,58)],
+      ["Period 3","period",T(10,1),T(11,23)],
+      ["Brunch","rest",T(11,23),T(11,37)],
+      ["Period 5","period",T(11,40),T(13,2)],
+      ["Lunch","rest",T(13,2),T(13,38)],
+      ["Period 7","period",T(13,41),T(15,3)]
+    ]
+  },
+  fri: {
+    label:"Friday", sublabel:"Advisory", name:"Friday · Advisory", tag:"all periods", tagClass:"", warn:T(8,25),
+    blocks:[
+      ["Period 1","period",T(8,30),T(9,12)],
+      ["Period 2","period",T(9,15),T(9,57)],
+      ["Period 3 + Announcements","period",T(10,0),T(10,42)],
+      ["Brunch","rest",T(10,42),T(10,56)],
+      ["Advisory","rest",T(10,59),T(11,27)],
+      ["Period 4","period",T(11,30),T(12,12)],
+      ["Period 5","period",T(12,15),T(12,57)],
+      ["Lunch","rest",T(12,57),T(13,33)],
+      ["Period 6","period",T(13,36),T(14,18)],
+      ["Period 7","period",T(14,21),T(15,3)]
+    ]
+  },
+  min: {
+    label:"Minimum Day", name:"Minimum Day", tag:"all periods · out 12:30", tagClass:"", warn:T(8,25),
+    blocks:[
+      ["Period 1","period",T(8,30),T(9,0)],
+      ["Period 2","period",T(9,3),T(9,33)],
+      ["Period 3","period",T(9,36),T(10,6)],
+      ["Period 4","period",T(10,9),T(10,39)],
+      ["Brunch","rest",T(10,39),T(10,51)],
+      ["Period 5","period",T(10,54),T(11,24)],
+      ["Period 6","period",T(11,27),T(11,57)],
+      ["Period 7","period",T(12,0),T(12,30)]
+    ]
+  },
+  firstday: {
+    label:"First Day", name:"First Day of School", tag:"advisory · late start", tagClass:"", warn:T(9,12),
+    blocks:[
+      ["Advisory","rest",T(9,17),T(10,0)],
+      ["Period 1","period",T(10,3),T(10,35)],
+      ["Period 2","period",T(10,38),T(11,10)],
+      ["Brunch","rest",T(11,10),T(11,24)],
+      ["Period 3","period",T(11,27),T(11,59)],
+      ["Period 4","period",T(12,2),T(12,34)],
+      ["Lunch","rest",T(12,34),T(13,10)],
+      ["Period 5","period",T(13,13),T(13,45)],
+      ["Period 6","period",T(13,48),T(14,20)],
+      ["Period 7","period",T(14,23),T(15,3)]
+    ]
+  },
+  launch: {
+    label:"Viking Launch", name:"Viking Launch", tag:"advisory + assembly", tagClass:"", warn:T(8,25),
+    blocks:[
+      ["Advisory","rest",T(8,30),T(9,5)],
+      ["Period 1","period",T(9,8),T(9,43)],
+      ["Period 2","period",T(9,46),T(10,21)],
+      ["Period 3","period",T(10,24),T(10,59)],
+      ["Brunch","rest",T(10,59),T(11,13)],
+      ["Period 4","period",T(11,17),T(11,52)],
+      ["Period 5","period",T(11,55),T(12,30)],
+      ["Lunch","rest",T(12,30),T(13,6)],
+      ["Period 6","period",T(13,9),T(13,44)],
+      ["Period 7","period",T(13,47),T(14,22)],
+      ["Assembly","rest",T(14,22),T(15,3)]
+    ]
+  },
+  lastday: {
+    label:"Last Day", name:"Last Day of School", tag:"minimum day · out 11:30", tagClass:"", warn:T(8,25),
+    blocks:[
+      ["Period 1","period",T(8,30),T(8,51)],
+      ["Period 2","period",T(8,54),T(9,15)],
+      ["Period 3","period",T(9,18),T(9,39)],
+      ["Period 4","period",T(9,42),T(10,3)],
+      ["Brunch","rest",T(10,3),T(10,15)],
+      ["Period 5","period",T(10,18),T(10,39)],
+      ["Period 6","period",T(10,42),T(11,3)],
+      ["Period 7","period",T(11,6),T(11,30)]
+    ]
+  },
+  holiday: {
+    label:"Holiday", name:"Holiday", tag:"no school", tagClass:"", warn:null,
+    holiday:true, blocks:[]
+  }
+};
+
+/* ---------- no-school days ----------
+   Weekends are handled separately and always count as no school. */
+
+// single fixed dates, same every year
+const HOLIDAY_DATES = [
+  "10-09",
+  "11-11",   // Veterans Day
+  "01-19",   // staff development day, the Tuesday after MLK
+  "05-31"    // Memorial Day
+];
+
+// [start, end] — inclusive. A range may wrap past New Year.
+const HOLIDAY_RANGES = [
+  ["11-23", "11-27"],
+  ["12-21", "01-01"],
+  ["02-15", "02-19"],
+  ["04-05", "04-09"]
+];
+
+// holidays that land on a different date each year
+// weekday: 0=Sun … 6=Sat
+const FLOATING_HOLIDAYS = [
+  { month:9, weekday:1, nth:1 },  // Labor Day — 1st Monday of September
+  { month:1, weekday:1, nth:3 }   // MLK Day   — 3rd Monday of January
+];
+
+/* ---------- date helpers for event rules ---------- */
+const pad = n => String(n).padStart(2,"0");
+const md  = dt => pad(dt.getUTCMonth()+1) + "-" + pad(dt.getUTCDate());
+
+// nth given weekday of a month, e.g. 1st Friday of October
+function nthWeekday(year, month, weekday, nth){
+  const first = new Date(Date.UTC(year, month - 1, 1));
+  const day = 1 + ((weekday - first.getUTCDay() + 7) % 7) + (nth - 1) * 7;
+  return pad(month) + "-" + pad(day);
+}
+
+// last given weekday of a month, e.g. last Friday of May
+function lastWeekday(year, month, weekday){
+  const last = new Date(Date.UTC(year, month, 0));
+  last.setUTCDate(last.getUTCDate() - ((last.getUTCDay() - weekday + 7) % 7));
+  return md(last);
+}
+
+// the given weekday strictly before a date, e.g. the Wednesday before 11-23
+function weekdayBefore(year, mmdd, weekday){
+  const [m,d] = mmdd.split("-").map(Number);
+  const dt = new Date(Date.UTC(year, m - 1, d));
+  do { dt.setUTCDate(dt.getUTCDate() - 1); } while (dt.getUTCDay() !== weekday);
+  return md(dt);
+}
+
+// n days before a date
+function minusDays(year, mmdd, n){
+  const [m,d] = mmdd.split("-").map(Number);
+  return md(new Date(Date.UTC(year, m - 1, d - n)));
+}
+
+// if it lands on a weekend, pull it back to the Friday before
+function toFriday(year, mmdd){
+  const [m,d] = mmdd.split("-").map(Number);
+  const dt = new Date(Date.UTC(year, m - 1, d));
+  const w = dt.getUTCDay();
+  if (w === 6) dt.setUTCDate(dt.getUTCDate() - 1);
+  if (w === 0) dt.setUTCDate(dt.getUTCDate() - 2);
+  return md(dt);
+}
+
+// start of the nth full week of a month — the nth Monday whose whole
+// Mon–Fri sits inside that month
+function nthFullWeek(year, month, nth){
+  let found = 0;
+  const dt = new Date(Date.UTC(year, month - 1, 1));
+  dt.setUTCDate(1 + ((1 - dt.getUTCDay() + 7) % 7));   // first Monday
+  while (dt.getUTCMonth() === month - 1){
+    const fri = new Date(dt);
+    fri.setUTCDate(fri.getUTCDate() + 4);
+    if (fri.getUTCMonth() === month - 1 && ++found === nth) return md(dt);
+    dt.setUTCDate(dt.getUTCDate() + 7);
+  }
+  return null;
+}
+
+// shift a full YYYY-MM-DD by n days
+function addDays(iso, n){
+  const [y,m,d] = iso.split("-").map(Number);
+  const dt = new Date(Date.UTC(y, m - 1, d + n));
+  return dt.getUTCFullYear() + "-" + pad(dt.getUTCMonth()+1) + "-" + pad(dt.getUTCDate());
+}
+
+function inRange(mmdd, start, end){
+  return start <= end
+    ? (mmdd >= start && mmdd <= end)
+    : (mmdd >= start || mmdd <= end);   // range wraps the new year
+}
+
+// is today a day off?
+function isHoliday(now){
+  if (HOLIDAY_DATES.includes(now.date)) return true;
+  const year = parseInt(now.fullDate.slice(0,4), 10);
+  for (const f of FLOATING_HOLIDAYS)
+    if (nthWeekday(year, f.month, f.weekday, f.nth) === now.date) return true;
+  for (const [start, end] of HOLIDAY_RANGES)
+    if (inRange(now.date, start, end)) return true;
+  return false;
+}
+
+/* The date of the nth school day of the year. Walks the calendar, so
+   results are memoised — the school year doesn't change mid-session. */
+const _schoolDayCache = {};
+function nthSchoolDay(n){
+  if (_schoolDayCache[n] !== undefined) return _schoolDayCache[n];
+  const b = schoolYearBounds();
+  let count = 0, d = b.start;
+  while (d <= b.end){
+    if (isSchoolDay(d) && ++count === n) return (_schoolDayCache[n] = d);
+    d = addDays(d, 1);
+  }
+  return (_schoolDayCache[n] = null);
+}
+
+/* ---------- events ----------
+   `on` returns the MM-DD the event lands on for a given year, or a full
+   YYYY-MM-DD when the rule already knows its own year, or null if it
+   doesn't happen that year.
+     schedule: forces a bell schedule that day
+     block:    the block the event happens during (gets flagged in the tape)
+     time:     shown as-is; these run outside the bell schedule
+   Weekend rule: anything on a fixed date gets pulled back to the Friday
+   before if it lands on Sat or Sun — that's what toFriday() does. */
+const FIRST_DAY = "2026-08-12";   // update each school year
+
+const EVENTS = [
+  { name:"Schedule Day",
+    on: y => y === +FIRST_DAY.slice(0,4) ? minusDays(y, FIRST_DAY.slice(5), 5) : null,
+    schedule:"holiday", note:"Pick up your class schedule. No classes." },
+
+  { name:"Back to School Night",
+    on: y => toFriday(y, "08-26"), time:"6:00 – 7:30 PM", note:"After school" },
+
+  { name:"School Dance",
+    on: y => toFriday(y, "09-18"), time:"6:00 – 7:30 PM", note:"After school" },
+
+  { name:"Autumn Concert",
+    on: y => nthWeekday(y, 10, 5, 1), schedule:"assembly", block:"E",
+    note:"Concert during block E" },
+
+  { name:"Yosemite Field Trip",
+    on: y => nthFullWeek(y, 10, 2), days:5,
+    note:"8th grade, Monday to Friday. Schedule runs as normal." },
+
+  { name:"HallowEgan",
+    on: y => toFriday(y, "10-31") },
+
+  { name:"Turkey Trot",
+    on: y => weekdayBefore(y, "11-23", 3), block:"Tutorial", note:"During Tutorial" },
+
+  { name:"Holiday Faire",
+    on: y => nthWeekday(y, 12, 5, 1), note:"All day. Schedule runs as normal." },
+
+  { name:"Valentine's Hot Chocolate",
+    on: y => weekdayBefore(y, "02-14", 5), time:"8:00 – 8:45 AM" },
+
+  { name:"Spring Concert",
+    on: y => nthWeekday(y, 3, 5, 1), schedule:"assembly", block:"E",
+    note:"Concert during block E" },
+
+  { name:"Band Night",
+    on: y => toFriday(y, "03-25"), time:"5:00 – 6:00 PM", note:"In the multi" },
+
+  { name:"School Dance",
+    on: y => toFriday(y, "04-16"), time:"6:00 – 7:30 PM", note:"After school" },
+
+  { name:"Viking Showcase",
+    on: y => nthWeekday(y, 5, 4, 4), time:"8:30 AM – 1:00 PM", note:"8th grade" },
+
+  { name:"8th Grade Graduation Party",
+    on: y => lastWeekday(y, 5, 5), time:"7:00 – 9:00 PM" },
+
+  { name:"Boardwalk Trip",
+    on: y => nthWeekday(y, 6, 2, 1), note:"8th grade. Santa Cruz." },
+
+  { name:"8th Grade Graduation",
+    on: () => "06-02", time:"1:00 PM", note:"After school" },
+
+  /* Quarter ends are counted in school days, not calendar dates, so
+     these resolve their own full date rather than an MM-DD. */
+  { name:"End of Quarter 1", on: () => nthSchoolDay(45),  note:"School day 45" },
+  { name:"End of Quarter 2", on: () => nthSchoolDay(90),  note:"School day 90" },
+  { name:"End of Quarter 3", on: () => nthSchoolDay(135), note:"School day 135" },
+  { name:"End of Quarter 4", on: () => schoolYearBounds().end, note:"Last day of school" }
+];
+
+// every event resolved to a real date, this year and next, sorted.
+// multi-day events carry an endDate; single-day ones end where they start.
+function allEvents(now){
+  const y = parseInt(now.fullDate.slice(0,4), 10);
+  const out = [], seen = new Set();
+  for (const yr of [y, y + 1])
+    for (const ev of EVENTS){
+      const raw = ev.on(yr);
+      if (!raw) continue;
+      // a rule may hand back a full YYYY-MM-DD if it knows its own year
+      const date = raw.length === 10 ? raw : yr + "-" + raw;
+      const key = ev.name + "@" + date;
+      if (seen.has(key)) continue;      // same event resolved twice
+      seen.add(key);
+      out.push(Object.assign({}, ev, {
+        date, endDate: ev.days ? addDays(date, ev.days - 1) : date
+      }));
+    }
+  return out.sort((a,b) => a.date < b.date ? -1 : a.date > b.date ? 1 : 0);
+}
+const eventsToday    = now    => allEvents(now).filter(e => e.date <= now.fullDate && now.fullDate <= e.endDate);
+const eventsUpcoming = (now,n)=> allEvents(now).filter(e => e.date >  now.fullDate).slice(0, n);
+
+// pretty date for the upcoming list
+function prettyDate(iso){
+  const [y,m,d] = iso.split("-").map(Number);
+  const dt = new Date(Date.UTC(y, m - 1, d));
+  return ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][dt.getUTCDay()] + ", " +
+         ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][m-1] + " " + d;
+}
+
+/* ---------- school calendar ----------
+   Keys can be written two ways:
+     "MM-DD"       repeats every year   (e.g. "09-04")
+     "YYYY-MM-DD"  fires once, that year only (e.g. "2026-08-12")
+   A YYYY-MM-DD entry beats an MM-DD one on the same day.
+   This is the only block you need to edit to change the year's calendar. */
+const CALENDAR = {
+  "2026-08-12": "firstday",   // first day back, late start
+  "2026-08-13": "launch",     // Viking Launch
+  "2026-08-14": "launch",     // Viking Launch
+  "09-04":      "min",        // minimum day
+  "10-08":      "min",        // minimum day
+  "03-19":      "min",        // minimum day
+  "06-02":      "lastday"     // last day of school, out 11:30
+};
+
+const ORDER = ["mon","tue","wed","wednb","thu","fri",
+               "firstday","launch","min","lastday","assembly","holiday"];
+
+/* DAY_TO_KEY is the plain weekday fallback. Anything not listed here —
+   wednb, assembly, and the calendar-only schedules — shows up only when
+   you tap it, or when the calendar above says so. */
+const DAY_TO_KEY = { mon:"mon", tue:"tue", wed:"wed", thu:"thu", fri:"fri" };
+
+/* Which schedule opens by itself today?
+   Weekend, then holiday, then an event override, then a dated calendar
+   entry, then a yearly one, then the weekday. No-school always wins. */
+function autoKey(now){
+  if (now.dayKey === "sat" || now.dayKey === "sun") return "holiday";
+  if (isHoliday(now)) return "holiday";
+  const ev = eventsToday(now).find(e => e.schedule);
+  if (ev) return ev.schedule;
+  return CALENDAR[now.fullDate] || CALENDAR[now.date] || DAY_TO_KEY[now.dayKey] || "holiday";
+}
+
+/* ---------- San Francisco clock ---------- */
+const FMT = new Intl.DateTimeFormat("en-US", {
+  timeZone:"America/Los_Angeles", weekday:"short", month:"short", day:"numeric",
+  hour:"2-digit", minute:"2-digit", second:"2-digit", hour12:false
+});
+
+/* separate formatter just for the MM-DD calendar key */
+const DATE_FMT = new Intl.DateTimeFormat("en-US", {
+  timeZone:"America/Los_Angeles", year:"numeric", month:"2-digit", day:"2-digit"
+});
+
+function sfNow(){
+  const p = {};
+  for (const part of FMT.formatToParts(new Date())) p[part.type] = part.value;
+  const q = {};
+  for (const part of DATE_FMT.formatToParts(new Date())) q[part.type] = part.value;
+  let h = parseInt(p.hour,10); if (h === 24) h = 0;
+  const m = parseInt(p.minute,10), s = parseInt(p.second,10);
+  return {
+    dayKey: p.weekday.toLowerCase().slice(0,3),
+    date: q.month + "-" + q.day,
+    fullDate: q.year + "-" + q.month + "-" + q.day,
+    label: p.weekday + ", " + p.month + " " + p.day,
+    mins: h*60 + m + s/60,
+    display: (h % 12 || 12) + ":" + String(m).padStart(2,"0") + ":" + String(s).padStart(2,"0") + " " + (h >= 12 ? "PM" : "AM")
+  };
+}
+
+function fmtTime(mins){
+  let h = Math.floor(mins/60), m = Math.floor(mins%60);
+  const ap = h >= 12 ? "PM" : "AM";
+  h = h % 12 || 12;
+  return h + ":" + String(m).padStart(2,"0") + " " + ap;
+}
+
+/* minutes:seconds — 82 minutes reads as 82:14, not 1:22:14 */
+function fmtLeft(mins){
+  const total = Math.max(0, Math.round(mins * 60));
+  return Math.floor(total/60) + ":" + String(total % 60).padStart(2,"0");
+}
+
+/* hours:minutes:seconds — for the brunch and lunch countdowns */
+function fmtHMS(mins){
+  const t = Math.max(0, Math.round(mins * 60));
+  return Math.floor(t / 3600) + ":" +
+         String(Math.floor((t % 3600) / 60)).padStart(2,"0") + ":" +
+         String(t % 60).padStart(2,"0");
+}
+
+/* ---------- expand a schedule into blocks + the passing periods between ---------- */
+function buildTimeline(sched){
+  const out = [];
+  sched.blocks.forEach((b, i) => {
+    const [label, kind, start, end] = b;
+    out.push({ label, kind, start, end, gap:false });
+    const nxt = sched.blocks[i+1];
+    if (nxt && nxt[2] > end) out.push({ label:"Passing Period", kind:"rest", start:end, end:nxt[2], gap:true });
+  });
+  return out;
+}
+
+/* ---------- countdowns ----------
+   Counted in school days, not calendar days — that's the number that
+   actually means something. A school day is a weekday inside the school
+   year that isn't a holiday. */
+
+function schoolYearBounds(){
+  const startY = parseInt(FIRST_DAY.slice(0,4), 10);
+  const endMMDD = Object.keys(CALENDAR).find(k => CALENDAR[k] === "lastday") || "06-02";
+  return { start: FIRST_DAY, end: (startY + 1) + "-" + endMMDD };
+}
+
+function isSchoolDay(iso){
+  const dow = new Date(iso + "T12:00:00Z").getUTCDay();
+  if (dow === 0 || dow === 6) return false;
+  if (isHoliday({ date: iso.slice(5), fullDate: iso })) return false;
+  const b = schoolYearBounds();
+  return iso >= b.start && iso <= b.end;
+}
+
+// school days from the day after `from` through `to`, inclusive
+function schoolDaysUntil(from, to){
+  if (!to || to <= from) return 0;
+  let n = 0, d = from;
+  while (d < to){ d = addDays(d, 1); if (isSchoolDay(d)) n++; }
+  return n;
+}
+
+function calendarDaysUntil(from, to){
+  return Math.round((new Date(to + "T12:00:00Z") - new Date(from + "T12:00:00Z")) / 86400000);
+}
+
+// are we inside a multi-day break right now?
+function inBreak(now){
+  return HOLIDAY_RANGES.some(([s,e]) => inRange(now.date, s, e));
+}
+
+// start of the next multi-day break, within this school year only
+function nextBreak(now){
+  const y = parseInt(now.fullDate.slice(0,4), 10);
+  const end = schoolYearBounds().end;
+  const out = [];
+  for (const yr of [y, y + 1])
+    for (const [start] of HOLIDAY_RANGES) out.push(yr + "-" + start);
+  return out.filter(d => d >= now.fullDate && d <= end).sort()[0] || null;
+}
+
+// next day the calendar marks as a minimum day, within this school year only
+function nextMinDay(now){
+  const y = parseInt(now.fullDate.slice(0,4), 10);
+  const end = schoolYearBounds().end;
+  const out = [];
+  for (const k in CALENDAR){
+    if (CALENDAR[k] !== "min") continue;
+    if (k.length === 10) out.push(k);
+    else for (const yr of [y, y + 1]) out.push(yr + "-" + k);
+  }
+  return out.filter(d => d >= now.fullDate && d <= end).sort()[0] || null;
+}
+
+function nextGraduation(now){
+  const end = schoolYearBounds().end;
+  const e = allEvents(now).find(e =>
+    e.name === "8th Grade Graduation" && e.date >= now.fullDate && e.date <= end);
+  return e ? e.date : null;
+}
+
+/* ---------- themes ----------
+   `months` limits a theme to certain months (Fall is October–November).
+   Anything without it is available year round. */
+const THEMES = [
+  { id:"dark",   name:"Dark",   swatch:"#FFB627" },
+  { id:"light",  name:"Light",  swatch:"#A85F00" },
+  { id:"space",  name:"Space",  swatch:"#8FB3FF" },
+  { id:"coffee", name:"Coffee", swatch:"#DBA268" },
+  { id:"arctic", name:"Arctic", swatch:"#0A7398" },
+  { id:"forest", name:"Forest", swatch:"#4FC1A0" },
+  { id:"blue",   name:"Blue",   swatch:"#2666BC" },
+  { id:"fall",   name:"Fall",   swatch:"#BC4C15", months:[10,11] }
+];
+const DEFAULT_THEME = "dark";
+
+const themeOK = (t, now) => !t.months || t.months.includes(parseInt(now.date.slice(0,2), 10));
+
+// localStorage isn't available everywhere this file might run, so every
+// touch of it is guarded — the theme just won't persist if it's blocked.
+function saveTheme(id){ try { localStorage.setItem("bell.theme", id); } catch(e){} }
+function loadTheme(){ try { return localStorage.getItem("bell.theme"); } catch(e){ return null; } }
+
+let theme = DEFAULT_THEME;
+
+/* After 7pm the app drops to Dark so a light theme doesn't blind you at
+   night. This is a display override only — it never overwrites the saved
+   preference, so your daytime theme is still there tomorrow. Picking any
+   theme after 7pm sticks for the rest of the evening. */
+const NIGHT_HOUR = 19;
+let nightApplied = null;   // the date we've already dimmed for
+
+function startingTheme(now){
+  if (Math.floor(now.mins / 60) >= NIGHT_HOUR){
+    nightApplied = now.fullDate;
+    return DEFAULT_THEME;
+  }
+  return loadTheme() || DEFAULT_THEME;
+}
+
+// fires once when 7pm passes, then leaves you alone
+function nightCheck(now){
+  if (Math.floor(now.mins / 60) >= NIGHT_HOUR && nightApplied !== now.fullDate){
+    nightApplied = now.fullDate;
+    applyTheme(DEFAULT_THEME, now);
+  }
+}
+
+function applyTheme(id, now){
+  const t = THEMES.find(t => t.id === id);
+  // a seasonal theme that's out of season falls back to the default
+  theme = (t && themeOK(t, now)) ? id : DEFAULT_THEME;
+  document.documentElement.setAttribute("data-theme", theme);
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute("content",
+    getComputedStyle(document.documentElement).getPropertyValue("--ink").trim());
+  [...el("themes").children].forEach(b =>
+    b.setAttribute("aria-pressed", String(b.dataset.id === theme)));
+}
+
+let themeMonth = null;
+function buildThemes(now){
+  themeMonth = now.date.slice(0,2);
+  const nav = el("themes");
+  nav.innerHTML = "";
+  THEMES.filter(t => themeOK(t, now)).forEach(t => {
+    const b = document.createElement("button");
+    b.dataset.id = t.id;
+    b.innerHTML = '<span class="swatch" style="background:' + t.swatch + '"></span>' + t.name +
+      (t.months ? '<span class="seasonal">seasonal</span>' : '');
+    b.addEventListener("click", () => { saveTheme(t.id); applyTheme(t.id, sfNow()); });
+    nav.appendChild(b);
+  });
+}
+
+// every school day in the year
+function totalSchoolDays(){
+  const b = schoolYearBounds();
+  return schoolDaysUntil(addDays(b.start, -1), b.end);
+}
+
+/* School days finished so far. Today only counts once its last bell has
+   rung — being partway through Tuesday doesn't mean Tuesday is done.
+   Uses the schedule the calendar picked for today, not whichever one is
+   selected in the picker, so previewing another day can't skew it. */
+function schoolDaysDone(now, before){
+  const b = schoolYearBounds();
+  if (now.fullDate < b.start) return 0;
+  if (now.fullDate > b.end) return totalSchoolDays();
+  let done = before;
+  if (isSchoolDay(now.fullDate)){
+    const sched = SCHEDULES[autoKey(now)];
+    if (!sched.holiday){
+      const line = buildTimeline(sched);
+      if (line.length && now.mins >= line[line.length - 1].end) done++;
+    }
+  }
+  return done;
+}
+
+/* ---------- alarm ----------
+   Sounds are synthesised with the Web Audio API rather than loaded from
+   files, so this stays a single self-contained page. */
+
+let audioCtx = null;
+function ac(){
+  if (!audioCtx){
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return null;
+    audioCtx = new AC();
+  }
+  if (audioCtx.state === "suspended") audioCtx.resume();
+  return audioCtx;
+}
+
+/* one note: optional glide to `to`, exponential decay */
+function blip(at, freq, dur, type, peak, to){
+  const c = ac(); if (!c) return;
+  const o = c.createOscillator(), g = c.createGain();
+  o.type = type || "sine";
+  o.frequency.setValueAtTime(freq, at);
+  if (to) o.frequency.linearRampToValueAtTime(to, at + dur);
+  g.gain.setValueAtTime(0.0001, at);
+  g.gain.exponentialRampToValueAtTime(peak, at + 0.01);
+  g.gain.exponentialRampToValueAtTime(0.0001, at + dur);
+  o.connect(g); g.connect(c.destination);
+  o.start(at); o.stop(at + dur + 0.03);
+}
+
+const RINGS = [
+  { id:"bell",    name:"Classic Bell", play:t => [[880,.30],[1320,.12],[2640,.05]]
+      .forEach(([f,v]) => blip(t, f, 1.8, "sine", v)) },
+  { id:"school",  name:"School Bell",  play:t => {
+      for (let i = 0; i < 16; i++) blip(t + i*0.09, 760, 0.075, "square", 0.16); } },
+  { id:"chime",   name:"Chime",        play:t => [784,659,523]
+      .forEach((f,i) => blip(t + i*0.22, f, 1.1, "sine", 0.26)) },
+  { id:"beep",    name:"Beep Beep",    play:t => {
+      for (let i = 0; i < 3; i++) blip(t + i*0.22, 1000, 0.13, "square", 0.2); } },
+  { id:"digital", name:"Digital",      play:t => {
+      for (let i = 0; i < 4; i++) blip(t + i*0.11, 1760, 0.07, "triangle", 0.22); } },
+  { id:"ping",    name:"Soft Ping",    play:t => blip(t, 1200, 1.2, "sine", 0.22) },
+  { id:"marimba", name:"Marimba",      play:t => [523,659,784,1046]
+      .forEach((f,i) => blip(t + i*0.13, f, 0.55, "triangle", 0.26)) },
+  { id:"siren",   name:"Siren",        play:t => {
+      for (let i = 0; i < 2; i++){
+        blip(t + i*0.9, 600, 0.45, "sawtooth", 0.14, 1200);
+        blip(t + i*0.9 + 0.45, 1200, 0.45, "sawtooth", 0.14, 600);
+      } } },
+  { id:"buzzer",  name:"Buzzer",       play:t => {
+      blip(t, 180, 0.85, "sawtooth", 0.16); blip(t, 183, 0.85, "sawtooth", 0.16); } },
+  { id:"tap",     name:"Triple Tap",   play:t => {
+      for (let i = 0; i < 3; i++) blip(t + i*0.13, 1500, 0.05, "square", 0.2); } }
+];
+
+let alarmMinutes = 0;
+let alarmRing = "bell";
+
+function playRing(id){
+  const c = ac(); if (!c) return;
+  const r = RINGS.find(r => r.id === (id || alarmRing)) || RINGS[0];
+  r.play(c.currentTime + 0.05);
+}
+
+/* Fires on the tick where the time remaining crosses the threshold, so
+   opening the app mid-period can't set it off late. Only runs on the
+   schedule the calendar picked for today — previewing another day is
+   never going to ring at you. */
+let alarmPrev = { key:null, left:null };
+
+function alarmCheck(now, sched, line){
+  if (!alarmMinutes || sched.holiday || activeKey !== todayKey){
+    alarmPrev = { key:null, left:null };
+    return;
+  }
+  const b = line.find(x => !x.gap && x.kind === "period" &&
+                           now.mins >= x.start && now.mins < x.end);
+  if (!b){ alarmPrev = { key:null, left:null }; return; }
+  const key = now.fullDate + "|" + b.start;
+  const left = b.end - now.mins;
+  if (alarmPrev.key === key && alarmPrev.left > alarmMinutes && left <= alarmMinutes)
+    playRing();
+  alarmPrev = { key, left };
+}
+
+function saveAlarm(){
+  try {
+    localStorage.setItem("bell.alarmMins", String(alarmMinutes));
+    localStorage.setItem("bell.alarmRing", alarmRing);
+  } catch(e){}
+}
+
+function setAlarmNote(){
+  el("alarmNote").textContent = alarmMinutes
+    ? "Rings " + alarmMinutes + " minute" + (alarmMinutes === 1 ? "" : "s") +
+      " before each class ends, once per period. Set it to 0 to turn it off."
+    : "Off. Type a number of minutes to turn it on, and hit Test once so the browser lets the page make sound.";
+}
+
+function buildAlarm(){
+  const sel = el("alarmRing");
+  RINGS.forEach(r => {
+    const o = document.createElement("option");
+    o.value = r.id; o.textContent = r.name;
+    sel.appendChild(o);
+  });
+  try {
+    alarmMinutes = parseInt(localStorage.getItem("bell.alarmMins"), 10) || 0;
+    alarmRing = localStorage.getItem("bell.alarmRing") || "bell";
+  } catch(e){}
+  if (!RINGS.some(r => r.id === alarmRing)) alarmRing = "bell";
+  sel.value = alarmRing;
+  if (alarmMinutes) el("alarmMins").value = alarmMinutes;
+
+  el("alarmMins").addEventListener("input", e => {
+    const v = parseInt(e.target.value, 10);
+    alarmMinutes = isNaN(v) ? 0 : Math.max(0, Math.min(60, Math.floor(v)));
+    saveAlarm(); setAlarmNote();
+  });
+  sel.addEventListener("change", e => {
+    alarmRing = e.target.value; saveAlarm(); playRing();
+  });
+  el("alarmTest").addEventListener("click", () => playRing());
+  setAlarmNote();
+}
+
+/* ---------- state ---------- */
+let todayKey = autoKey(sfNow());
+let activeKey = todayKey;
+
+/* ---------- selector ---------- */
+function buildPicker(){
+  const nav = el("picker");
+  nav.innerHTML = "";
+  ORDER.forEach(key => {
+    const s = SCHEDULES[key];
+    const b = document.createElement("button");
+    if (key === "holiday") b.classList.add("wide");
+    b.dataset.key = key;
+    const txt = document.createElement("span");
+    txt.textContent = s.sublabel ? s.label + " (" + s.sublabel + ")" : s.label;
+    b.appendChild(txt);
+    if (key === todayKey){
+      const f = document.createElement("span");
+      f.className = "flag"; f.textContent = "TODAY";
+      b.appendChild(f);
+    }
+    b.addEventListener("click", () => { activeKey = key; render(); });
+    nav.appendChild(b);
+  });
+}
+
+/* ---------- render ---------- */
+function render(){
+  const now = sfNow();
+  const sched = SCHEDULES[activeKey];
+  const line = buildTimeline(sched);
+
+  el("nowtime").textContent = now.display;
+  el("nowdate").textContent = now.label;
+
+  // if the app is left open past midnight, move the TODAY flag
+  const freshToday = autoKey(now);
+  if (freshToday !== todayKey){ todayKey = freshToday; buildPicker(); }
+
+  // Fall appears in October and vanishes after November, on its own
+  if (themeMonth !== now.date.slice(0,2)){
+    buildThemes(now);
+    applyTheme(loadTheme() || DEFAULT_THEME, now);
+  }
+  nightCheck(now);
+  alarmCheck(now, sched, line);
+  el("sname").textContent = sched.name;
+  const tag = el("tag");
+  tag.textContent = sched.tag;
+  tag.className = "tag " + sched.tagClass;
+
+  [...el("picker").children].forEach(b => b.setAttribute("aria-pressed", String(b.dataset.key === activeKey)));
+
+  const today = drawEvents(now);
+  drawProgress(sched, line, now.mins);
+  drawCountdowns(now);
+  drawTape(sched, line, now.mins, today);
+  drawHero(sched, line, now);
+}
+
+/* Percent through the school day, plus countdowns to brunch and lunch.
+   A meal countdown vanishes the moment that meal starts. */
+function drawProgress(sched, line, mins){
+  const wrap = el("dayprog");
+  if (sched.holiday || !line.length){
+    wrap.hidden = true;
+    el("meals").innerHTML = "";
+    return;
+  }
+  wrap.hidden = false;
+
+  const start = line[0].start, end = line[line.length - 1].end;
+  const raw = (mins - start) / (end - start) * 100;
+  const pct = Math.max(0, Math.min(100, Math.floor(raw)));
+  el("progPct").textContent = pct + "%";
+  el("progFill").style.width = pct + "%";
+
+  const card = (label, block) => {
+    if (!block || mins >= block.start) return "";
+    return '<div class="meal"><div class="meal-label">' + label + ' in</div>' +
+      '<div class="meal-time">' + fmtHMS(block.start - mins) + '</div>' +
+      '<div class="meal-at">at ' + fmtTime(block.start) + '</div></div>';
+  };
+
+  el("meals").innerHTML =
+      card("Brunch", line.find(b => b.label === "Brunch"))
+    + card("Lunch",  line.find(b => b.label === "Lunch"));
+}
+
+/* The school-day count walks the calendar, so it only recomputes when
+   the date changes — not on every tick. */
+let countCache = { date:null, html:"" };
+let yearCache  = { date:null, total:0, before:0 };
+
+function drawCountdowns(now){
+  if (countCache.date !== now.fullDate)
+    countCache = { date: now.fullDate, html: buildCountdowns(now) };
+  el("counts").innerHTML = countCache.html;
+  drawYear(now);
+}
+
+function drawYear(now){
+  // the walk over past days only changes once a day; cache it
+  if (yearCache.date !== now.fullDate){
+    const b = schoolYearBounds();
+    yearCache = {
+      date: now.fullDate,
+      total: totalSchoolDays(),
+      before: now.fullDate <= b.start ? 0
+            : schoolDaysUntil(addDays(b.start, -1), addDays(now.fullDate, -1))
+    };
+  }
+  const total = yearCache.total;
+  const done = Math.min(total, schoolDaysDone(now, yearCache.before));
+  const pct = total ? Math.round(done / total * 100) : 0;
+
+  el("yearFill").style.width = pct + "%";
+  el("yearLine").innerHTML =
+    "You have finished <b>" + pct + "%</b> of the school year." +
+    '<div class="year-sub">' + done + " of " + total + " school days</div>";
+}
+
+function buildCountdowns(now){
+  const card = (label, target, nowText) => {
+    if (nowText)
+      return '<div class="count"><div class="count-label">' + label + '</div>' +
+             '<div class="count-num soft">' + nowText + '</div></div>';
+    if (!target)
+      return '<div class="count"><div class="count-label">' + label + '</div>' +
+             '<div class="count-num soft">—</div><div class="count-unit">nothing left this year</div></div>';
+
+    const school = schoolDaysUntil(now.fullDate, target);
+    const cal = calendarDaysUntil(now.fullDate, target);
+    if (cal === 0)
+      return '<div class="count"><div class="count-label">' + label + '</div>' +
+             '<div class="count-num soft">Today</div>' +
+             '<div class="count-date">' + prettyDate(target) + '</div></div>';
+
+    return '<div class="count"><div class="count-label">' + label + '</div>' +
+      '<div class="count-num">' + school + '</div>' +
+      '<div class="count-unit">school day' + (school === 1 ? '' : 's') + '<br>' + cal + ' on the calendar</div>' +
+      '<div class="count-date">' + prettyDate(target) + '</div></div>';
+  };
+
+  return card("Next break",   nextBreak(now),   inBreak(now) ? "You're in it" : null)
+       + card("Next min day", nextMinDay(now),  null)
+       + card("Graduation",   nextGraduation(now), null);
+}
+
+// today's events + the upcoming list; returns today's for the tape to flag
+function drawEvents(now){
+  const today = eventsToday(now);
+  el("eventbar").innerHTML = today.map(e => {
+    // for a multi-day event, say which day of it we're on
+    const span = e.days ? "Day " + (dayIndex(e.date, now.fullDate) + 1) + " of " + e.days : null;
+    return '<div class="eventbar"><div class="ev-name">' + e.name + '</div>' +
+      (e.time || span ? '<div class="ev-time">' + (e.time || span) + '</div>' : '') +
+      (e.note ? '<div class="ev-note">' + e.note + '</div>' : '') +
+      '</div>';
+  }).join("");
+
+  const soon = eventsUpcoming(now, 4);
+  el("upcomingWrap").hidden = soon.length === 0;
+  el("upcoming").innerHTML = soon.map(e =>
+    '<div class="up-row"><div class="up-name">' + e.name +
+    (e.time || e.note ? '<div class="up-note">' + (e.time || e.note) + '</div>' : '') +
+    '</div><div class="up-date">' + prettyDate(e.date) +
+    (e.endDate !== e.date ? ' – ' + prettyDate(e.endDate) : '') +
+    '</div></div>').join("");
+
+  return today;
+}
+
+// how many days into a multi-day event we are
+function dayIndex(startISO, todayISO){
+  const a = new Date(startISO + "T12:00:00Z"), b = new Date(todayISO + "T12:00:00Z");
+  return Math.round((b - a) / 86400000);
+}
+
+let builtKey = null;
+
+function drawTape(sched, line, mins, todayEvents){
+  const tape = el("tape");
+  const nl = el("nowline");
+
+  // which blocks carry an event today, e.g. concert during E
+  const flags = {};
+  (todayEvents || []).forEach(e => { if (e.block) flags[e.block] = e.name; });
+  const signature = activeKey + "|" + JSON.stringify(flags);
+
+  // rebuild the rows only when the schedule or its event flags change
+  if (builtKey !== signature){
+    builtKey = signature;
+    [...tape.querySelectorAll(".row")].forEach(r => r.remove());
+
+    if (sched.holiday){
+      const row = document.createElement("div");
+      row.className = "row free";
+      row.innerHTML = '<div class="seg" style="min-height:120px"></div>' +
+        '<div class="cell"><div class="lbl">Free</div><div class="meta">all day</div></div>';
+      tape.appendChild(row);
+    } else {
+      const SCALE = 1.15, MIN_H = 22, MIN_GAP_H = 13;
+      line.forEach((b, i) => {
+        const dur = b.end - b.start;
+        const row = document.createElement("div");
+        row.className = "row " + (b.gap ? "gap" : b.kind);
+        row.dataset.i = i;
+        const h = Math.max(b.gap ? MIN_GAP_H : MIN_H, dur * SCALE);
+        row.innerHTML =
+          '<div class="seg" style="min-height:' + h + 'px"></div>' +
+          '<div class="cell"><div class="lbl">' + b.label +
+          (flags[b.label] ? '<span class="chip">' + flags[b.label] + '</span>' : '') +
+          '</div><div class="meta">' +
+          (b.gap ? dur + " min" : fmtTime(b.start) + " – " + fmtTime(b.end) + " · " + dur + "m") +
+          '</div></div>';
+        tape.appendChild(row);
+      });
+    }
+  }
+
+  if (sched.holiday){ nl.classList.add("hidden"); return; }
+
+  // each tick: just repaint the highlight + move the line
+  line.forEach((b, i) => {
+    const row = tape.querySelector('.row[data-i="' + i + '"]');
+    if (!row) return;
+    row.classList.remove("done","now","rest");
+    if (mins >= b.end) row.classList.add("done");
+    else if (mins >= b.start){
+      row.classList.add("now");
+      if (b.kind === "rest") row.classList.add("rest");
+    }
+  });
+
+  const idx = line.findIndex(b => mins >= b.start && mins < b.end);
+  if (idx === -1){ nl.classList.add("hidden"); return; }
+  const row = tape.querySelector('.row[data-i="' + idx + '"]');
+  const b = line[idx];
+  nl.style.top = (row.offsetTop + ((mins - b.start) / (b.end - b.start)) * row.offsetHeight) + "px";
+  nl.className = "nowline" + (b.kind === "rest" ? " rest" : "");
+}
+
+function drawHero(sched, line, now){
+  const eyebrow = el("eyebrow"), title = el("title"), sub = el("subtitle");
+  const clock = el("clock"), clockLabel = el("clockLabel"), upnext = el("upnext");
+  const set = cls => { eyebrow.className = "eyebrow " + cls; clock.className = "clock " + cls; };
+  const mins = now.mins;
+
+  if (sched.holiday){
+    set("rest");
+    eyebrow.textContent = "No school";
+    title.textContent = "Free";
+    sub.textContent = "No bells today.";
+    clock.textContent = "—";
+    clockLabel.textContent = "all day";
+    upnext.innerHTML = "";
+    return;
+  }
+
+  const first = line[0], last = line[line.length-1];
+
+  if (mins < first.start){
+    set("rest");
+    eyebrow.textContent = "Before school";
+    title.textContent = "Not started";
+    sub.textContent = "Warning bell at " + fmtTime(sched.warn) + ".";
+    clock.textContent = fmtLeft(first.start - mins);
+    clockLabel.textContent = "until " + first.label;
+    upnext.innerHTML = "First up <b>" + first.label + "</b> at " + fmtTime(first.start);
+    return;
+  }
+
+  if (mins >= last.end){
+    set("off");
+    eyebrow.textContent = "Done";
+    title.textContent = "School's out";
+    sub.textContent = "Last bell rang at " + fmtTime(last.end) + ".";
+    clock.textContent = "0:00";
+    clockLabel.textContent = "nothing left";
+    upnext.innerHTML = "Day ran " + fmtTime(first.start) + " – " + fmtTime(last.end);
+    return;
+  }
+
+  const idx = line.findIndex(b => mins >= b.start && mins < b.end);
+  const cur = line[idx], nxt = line[idx+1];
+
+  if (cur.gap){
+    set("rest");
+    eyebrow.textContent = "Between periods";
+    title.textContent = "Passing Period";
+    sub.textContent = (cur.end - cur.start) + " minutes to get there.";
+  } else if (cur.kind === "rest"){
+    set("rest");
+    eyebrow.textContent = "Break";
+    title.textContent = cur.label;
+    sub.textContent = fmtTime(cur.start) + " – " + fmtTime(cur.end);
+  } else {
+    set("");
+    eyebrow.textContent = "Right now";
+    title.textContent = cur.label;
+    sub.textContent = fmtTime(cur.start) + " – " + fmtTime(cur.end);
+  }
+
+  clock.textContent = fmtLeft(cur.end - mins);
+  clockLabel.textContent = cur.gap ? "until class starts" : "until the bell";
+
+  if (!nxt){
+    upnext.innerHTML = "Last one of the day.";
+  } else if (nxt.gap){
+    const after = line[idx+2];
+    upnext.innerHTML = "Next up <b>" + after.label + "</b> at " + fmtTime(after.start);
+  } else {
+    upnext.innerHTML = "Next up <b>" + nxt.label + "</b> at " + fmtTime(nxt.start);
+  }
+}
+
+/* ---------- go ---------- */
+function tick(){
+  try { render(); }
+  catch (err) {
+    console.error("render failed:", err);
+    el("subtitle").textContent = "Something broke — check the console.";
+  }
+}
+buildPicker();
+buildThemes(sfNow());
+buildAlarm();
+applyTheme(startingTheme(sfNow()), sfNow());
+tick();
+setInterval(tick, 1000);
+window.addEventListener("resize", tick);
+</script>
+</body>
+</html>
